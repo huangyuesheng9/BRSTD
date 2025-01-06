@@ -1,6 +1,6 @@
 # Project Name
 
-BRSTD:Bio-Inspired Remote Sensing Tiny Object Detection
+BRSTD: Bio-Inspired Remote Sensing Tiny Object Detection
 
 ## Download
 
