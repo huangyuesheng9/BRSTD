@@ -2,9 +2,7 @@
 
 BRSTD: Bio-Inspired Remote Sensing Tiny Object Detection
 
-## Download
-
-The downloadable program is available in the `master` branch. 
+## The code is coming
 
 ## Run the Program
 
