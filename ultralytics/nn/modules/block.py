@@ -46,6 +46,7 @@ __all__ = (
     "Attention",
     "PSA",
     "SCDown",
+    "RA",
 )
 
 
@@ -955,3 +956,21 @@ class SCDown(nn.Module):
             (torch.Tensor): Output tensor after applying the SCDown module.
         """
         return self.cv2(self.cv1(x))
+
+class RA(nn.Module):  #相邻消除模块
+    def __init__(self, c1, c2, upsize=2): #c1小 c2大
+        super().__init__()
+        self.upsample = nn.Upsample(scale_factor=upsize, mode='nearest')
+        self.sigmoid = nn.Sigmoid()
+        self.DWconv = nn.Conv2d(c2, c1, 1, 1, 0)
+        # self.Dsample = nn.Conv2d(c1, c1, upsize, upsize)
+    def forward(self, x):
+        ps, ps1 = x[0], x[1]
+        gs = self.sigmoid(self.DWconv(self.upsample(ps1)))
+        ram = 1 - gs
+        pss = ps * ram
+
+        return pss  #两个特征图相减
+
+
+

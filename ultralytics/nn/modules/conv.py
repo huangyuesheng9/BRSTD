@@ -337,85 +337,14 @@ class Concat(nn.Module):
         return torch.cat(x, self.d)
 
 
-class Xc(nn.Module):
-    def __init__(self, in_channels, out_channels):
-        super(Xc, self).__init__()
-
-        self.Xcenter = Conv(in_channels, in_channels, k=1, g=in_channels)
-        self.Xcenter_relu = nn.ReLU(inplace=True)
-
-        self.Xsurround = Conv(in_channels, in_channels, k=3, p=1, g=in_channels)
-        self.Xsurround_relu = nn.ReLU(inplace=True)
-
-
-
-    def forward(self, input):
-        xcenter = self.Xcenter_relu(self.Xcenter(input))
-        xsurround = self.Xsurround_relu(self.Xsurround(input))
-        
-
-        x = xsurround - xcenter
-
-
-        return x
-
-
-class Yc(nn.Module):
-    def __init__(self, in_channels, out_channels):
-        super(Yc, self).__init__()
-        self.Ycenter = Conv(in_channels, in_channels, k=1, g=in_channels)
-        self.Ycenter_relu = nn.ReLU(inplace=True)
-
-        self.Ysurround3 = Conv(in_channels, in_channels, k=5, p=4, d=2, g=in_channels)
-        self.Ysurround = Conv(in_channels, in_channels, k=9, p=4, g=in_channels)
-
-        
-        self.Ysurround_relu = nn.ReLU(inplace=True)
-
-
-
-    def forward(self, input):
-        ycenter = self.Ycenter_relu(self.Ycenter(input))
-        ysurround = self.Ysurround_relu(self.Ysurround(input))
-       
-
-        ysurround3 = self.Ysurround_relu(self.Ysurround3(input))
-        
-
-        y = ysurround - ycenter - ysurround3
-
-
-        return y
-
-class W(nn.Module):
-    def __init__(self, inchannel, outchannel):
-        super(W, self).__init__()
-        
-        self.h = Conv(inchannel, inchannel, k=(1, 3), p=(0, 1), g=inchannel)
-        self.v = Conv(inchannel, inchannel, k=(3, 1), p=(1, 0), g=inchannel)
-        
-        
-        self.relu = nn.ReLU()
-
-    def forward(self, x):
-
-        h = self.relu(self.h(x))
-        
-
-        v = self.relu(self.v(h))
-        
-
-        return v
-
 # class Xc(nn.Module):
 #     def __init__(self, in_channels, out_channels):
 #         super(Xc, self).__init__()
 
-#         self.Xcenter = nn.Conv2d(in_channels, in_channels, kernel_size=1)
+#         self.Xcenter = Conv(in_channels, in_channels, k=1, g=in_channels)
 #         self.Xcenter_relu = nn.ReLU(inplace=True)
 
-#         self.Xsurround = nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, groups=in_channels)
-#         self.conv1_1 = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+#         self.Xsurround = Conv(in_channels, in_channels, k=3, p=1, g=in_channels)
 #         self.Xsurround_relu = nn.ReLU(inplace=True)
 
 
@@ -423,7 +352,7 @@ class W(nn.Module):
 #     def forward(self, input):
 #         xcenter = self.Xcenter_relu(self.Xcenter(input))
 #         xsurround = self.Xsurround_relu(self.Xsurround(input))
-#         xsurround = self.conv1_1(xsurround)
+        
 
 #         x = xsurround - xcenter
 
@@ -434,13 +363,13 @@ class W(nn.Module):
 # class Yc(nn.Module):
 #     def __init__(self, in_channels, out_channels):
 #         super(Yc, self).__init__()
-#         self.Ycenter = nn.Conv2d(in_channels, in_channels, kernel_size=1)
+#         self.Ycenter = Conv(in_channels, in_channels, k=1, g=in_channels)
 #         self.Ycenter_relu = nn.ReLU(inplace=True)
 
-#         self.Ysurround3 = nn.Conv2d(in_channels, in_channels, kernel_size=5, padding=4, dilation=2, groups=in_channels)
-#         self.Ysurround = nn.Conv2d(in_channels, in_channels, kernel_size=9, padding=4, groups=in_channels)
+#         self.Ysurround3 = Conv(in_channels, in_channels, k=5, p=4, d=2, g=in_channels)
+#         self.Ysurround = Conv(in_channels, in_channels, k=9, p=4, g=in_channels)
 
-#         self.conv1_1 = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+        
 #         self.Ysurround_relu = nn.ReLU(inplace=True)
 
 
@@ -448,10 +377,10 @@ class W(nn.Module):
 #     def forward(self, input):
 #         ycenter = self.Ycenter_relu(self.Ycenter(input))
 #         ysurround = self.Ysurround_relu(self.Ysurround(input))
-#         ysurround = self.conv1_1(ysurround)
+       
 
 #         ysurround3 = self.Ysurround_relu(self.Ysurround3(input))
-#         ysurround3 = self.conv1_1(ysurround3)
+        
 
 #         y = ysurround - ycenter - ysurround3
 
@@ -462,22 +391,93 @@ class W(nn.Module):
 #     def __init__(self, inchannel, outchannel):
 #         super(W, self).__init__()
         
-#         self.h = nn.Conv2d(inchannel, inchannel, kernel_size=(1, 3), padding=(0, 1),groups=inchannel)
-#         self.v = nn.Conv2d(inchannel, inchannel, kernel_size=(3, 1), padding=(1, 0),groups=inchannel)
+#         self.h = Conv(inchannel, inchannel, k=(1, 3), p=(0, 1), g=inchannel)
+#         self.v = Conv(inchannel, inchannel, k=(3, 1), p=(1, 0), g=inchannel)
         
-#         self.convh_1 = Conv(inchannel, inchannel, k=1, p=0)
-#         self.convv_1 = Conv(inchannel, outchannel, k=1, p=0)
+        
 #         self.relu = nn.ReLU()
 
 #     def forward(self, x):
 
 #         h = self.relu(self.h(x))
-#         h = self.convh_1(h)
+        
 
 #         v = self.relu(self.v(h))
-#         v = self.convv_1(v)
+        
 
 #         return v
+
+class Xc(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(Xc, self).__init__()
+
+        self.Xcenter = nn.Conv2d(in_channels, in_channels, kernel_size=1)
+        self.Xcenter_relu = nn.ReLU(inplace=True)
+
+        self.Xsurround = nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, groups=in_channels)
+        self.conv1_1 = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+        self.Xsurround_relu = nn.ReLU(inplace=True)
+
+
+
+    def forward(self, input):
+        xcenter = self.Xcenter_relu(self.Xcenter(input))
+        xsurround = self.Xsurround_relu(self.Xsurround(input))
+        xsurround = self.conv1_1(xsurround)
+
+        x = xsurround - xcenter
+
+
+        return x
+
+
+class Yc(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(Yc, self).__init__()
+        self.Ycenter = nn.Conv2d(in_channels, in_channels, kernel_size=1)
+        self.Ycenter_relu = nn.ReLU(inplace=True)
+
+        self.Ysurround3 = nn.Conv2d(in_channels, in_channels, kernel_size=5, padding=4, dilation=2, groups=in_channels)
+        self.Ysurround = nn.Conv2d(in_channels, in_channels, kernel_size=9, padding=4, groups=in_channels)
+
+        self.conv1_1 = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+        self.Ysurround_relu = nn.ReLU(inplace=True)
+
+
+
+    def forward(self, input):
+        ycenter = self.Ycenter_relu(self.Ycenter(input))
+        ysurround = self.Ysurround_relu(self.Ysurround(input))
+        ysurround = self.conv1_1(ysurround)
+
+        ysurround3 = self.Ysurround_relu(self.Ysurround3(input))
+        ysurround3 = self.conv1_1(ysurround3)
+
+        y = ysurround - ycenter - ysurround3
+
+
+        return y
+
+class W(nn.Module):
+    def __init__(self, inchannel, outchannel):
+        super(W, self).__init__()
+        
+        self.h = nn.Conv2d(inchannel, inchannel, kernel_size=(1, 3), padding=(0, 1),groups=inchannel)
+        self.v = nn.Conv2d(inchannel, inchannel, kernel_size=(3, 1), padding=(1, 0),groups=inchannel)
+        
+        self.convh_1 = Conv(inchannel, inchannel, k=1, p=0)
+        self.convv_1 = Conv(inchannel, outchannel, k=1, p=0)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+
+        h = self.relu(self.h(x))
+        h = self.convh_1(h)
+
+        v = self.relu(self.v(h))
+        v = self.convv_1(v)
+
+        return v
 
 class XYWA_f(nn.Module):
     def __init__(self, c1, ratio=16):
